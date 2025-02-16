@@ -44,8 +44,8 @@ class Bullet:
                     -self.direction.x if hit_horizontal else self.direction.x,
                     -self.direction.y if hit_vertical else self.direction.y
                 )
-                if random.random() < 0.3:
-                    self.bounced = True
+                # if random.random() < 0.3:
+                #     self.bounced = True
 
     def draw(self, screen):
         """绘制子弹"""

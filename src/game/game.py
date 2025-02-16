@@ -1,7 +1,11 @@
 import pygame
 import sys
+
+from src.entities.enemy import Enemy
 from src.entities.player import Player
 from src.entities.tank import Tank
+from src.trainer import DQN  # 导入DQN模型
+import torch
 
 
 class Game:
@@ -20,6 +24,7 @@ class Game:
         self.bullets = None
         self.enemy = None
         self.player = None
+        self.model = None  # 添加模型属性
         pygame.init()
         self.WINDOW_SIZE = window_size
         self.screen = pygame.display.set_mode((window_size, window_size))
@@ -29,10 +34,21 @@ class Game:
         self.FPS = 60
         self.reset_game()
 
+    def load_ai_model(self, model_path):
+        """加载AI模型"""
+        try:
+            self.model = DQN(state_size=8, action_size=5)
+            self.model.load_state_dict(torch.load(model_path))
+            self.model.eval()
+            print(f"Successfully loaded model from {model_path}")
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            sys.exit(1)
+
     def reset_game(self):
         """重置游戏状态"""
         self.player = Player(self.WINDOW_SIZE / 2, self.WINDOW_SIZE - 100)
-        self.enemy = Tank(self.WINDOW_SIZE / 2, 100)
+        self.enemy = Enemy(self.WINDOW_SIZE / 2, 100)  # 使用Enemy类
         self.bullets = []
         self.game_over = False
 
@@ -41,12 +57,19 @@ class Game:
         if self.game_over:
             return
 
-        for tank in [self.player, self.enemy]:
-            bullet = tank.update(self.WINDOW_SIZE)
-            if bullet:
-                for bulls in bullet:
-                    self.bullets.append(bulls)
+        # 更新玩家
+        bullet = self.player.update(self.WINDOW_SIZE)
+        if bullet and isinstance(bullet, list):  # 检查返回值是否为列表
+            for bulls in bullet:
+                self.bullets.append(bulls)
 
+        # 更新AI敌人
+        bullet = self.enemy.update(self.bullets, self.model)
+        if bullet and isinstance(bullet, list):  # 检查返回值是否为列表
+            for bulls in bullet:
+                self.bullets.append(bulls)
+
+        # 更新子弹
         for bullet in self.bullets[:]:
             bullet.update(self.WINDOW_SIZE)
 

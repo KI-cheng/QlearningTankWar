@@ -5,7 +5,7 @@ from .bullet import Bullet
 
 
 class Tank:
-    def __init__(self, x, y, size=20, speed=2):
+    def __init__(self, x, y, size=20, speed=5):
         """
         参数初始化
         position: 坦克位置
