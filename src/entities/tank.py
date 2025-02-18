@@ -54,13 +54,13 @@ class Tank:
         self.cooldown_counter = self.shoot_cooldown
 
         Bullets = []
-        Bullets.append(Bullet(self.position + self.direction * self.size, self.direction))
-        for i in range(1, 3):
+        # Bullets.append(Bullet(self.position + self.direction * self.size, self.direction))
+        for i in range(1, 4):
             random_x = random.uniform(-0.1, 0.1)
             random_y = random.uniform(-0.1, 0.1)
             # 偏移量
             v = Vector2(random_x, random_y)
-            Bullets.append(Bullet(self.position + (self.direction + v) * self.size, self.direction + v))
+            Bullets.append(Bullet(self.position + (self.direction + v) * self.size, self.direction + v*2))
         # print(Bullets)
         return Bullets
 

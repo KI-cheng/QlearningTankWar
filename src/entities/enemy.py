@@ -8,7 +8,7 @@ from .tank import Tank
 class Enemy(Tank):
     def __init__(self, x, y, size=20, speed=5):
         super().__init__(x, y, size, speed)
-        self.state_size = 8  # 状态空间维度
+        self.state_size = 42  # 状态空间维度
         self.action_size = 5  # 动作空间维度(上下左右停)
 
         # 动作映射表
@@ -23,19 +23,19 @@ class Enemy(Tank):
     def get_state(self, bullets):
         """获取状态向量"""
         state = []
-        # 坦克位置的归一化坐标
+        # 坦克位置坐标,使用extend添加确保添加的都是值
         state.extend([self.position.x / 800, self.position.y / 800])
 
-        # 找最近的3个子弹
         bullet_info = []
-        for bullet in bullets[:3]:
+        for bullet in bullets[:10]:
             # 子弹相对位置
             rel_pos = bullet.position - self.position
             bullet_info.extend([rel_pos.x / 800, rel_pos.y / 800])
+            bullet_info.extend([bullet.direction.x, bullet.direction.y])
 
-        # 如果子弹少于3个，用0填充
-        while len(bullet_info) < 6:
-            bullet_info.extend([0, 0])
+        # 如果子弹少于10个，用0填充
+        while len(bullet_info) < 40:
+            bullet_info.extend([0, 0, 0, 0])
 
         state.extend(bullet_info)
         return np.array(state)
@@ -61,5 +61,5 @@ class Enemy(Tank):
         if model is None or not self.alive:
             return None
 
-        state = self.get_state(bullets)
-        return self.act(state, model)
+        state = self.get_state(bullets)  # 获取所有的位置
+        return self.act(state, model)  # 模型选择的动作

@@ -37,7 +37,7 @@ class Game:
     def load_ai_model(self, model_path):
         """加载AI模型"""
         try:
-            self.model = DQN(state_size=8, action_size=5)
+            self.model = DQN(state_size=42, action_size=5)
             self.model.load_state_dict(torch.load(model_path))
             self.model.eval()
             print(f"Successfully loaded model from {model_path}")
@@ -48,7 +48,7 @@ class Game:
     def reset_game(self):
         """重置游戏状态"""
         self.player = Player(self.WINDOW_SIZE / 2, self.WINDOW_SIZE - 100)
-        self.enemy = Enemy(self.WINDOW_SIZE / 2, 100)  # 使用Enemy类
+        self.enemy = Enemy(self.WINDOW_SIZE / 2, 100)
         self.bullets = []
         self.game_over = False
 
@@ -57,22 +57,22 @@ class Game:
         if self.game_over:
             return
 
-        # 更新玩家
+        # 玩家：通过player更新玩家操作，然后再通过tank更新位置获取shoot返回的子弹
         bullet = self.player.update(self.WINDOW_SIZE)
         if bullet and isinstance(bullet, list):  # 检查返回值是否为列表
             for bulls in bullet:
                 self.bullets.append(bulls)
 
-        # 更新AI敌人
+        # AI敌人：通过enemy更新模型操作，继承的tank更新位置和shoot返回的子弹
         bullet = self.enemy.update(self.bullets, self.model)
         if bullet and isinstance(bullet, list):  # 检查返回值是否为列表
             for bulls in bullet:
                 self.bullets.append(bulls)
 
-        # 更新子弹
+        # 更新子弹位置
         for bullet in self.bullets[:]:
             bullet.update(self.WINDOW_SIZE)
-
+            # 更新后继续检测是否有碰撞
             for tank in [self.player, self.enemy]:
                 if tank.check_collision(bullet):
                     tank.life -= 1
@@ -80,7 +80,7 @@ class Game:
                     if tank.life == 0:
                         tank.alive = False
                         self.game_over = True
-
+            # 更新后的子弹检查是否失效，失效移除
             if not bullet.active:
                 self.bullets.remove(bullet)
 
@@ -114,8 +114,8 @@ class Game:
                     elif event.key == pygame.K_r and self.game_over:
                         self.reset_game()
 
-            self.update()
-            self.draw()
+            self.update()  # 更新游戏objects的状态
+            self.draw()  # 渲染更新后的状态
             self.clock.tick(self.FPS)
 
         pygame.quit()
