@@ -60,7 +60,7 @@ class Tank:
             random_y = random.uniform(-0.1, 0.1)
             # 偏移量
             v = Vector2(random_x, random_y)
-            Bullets.append(Bullet(self.position + (self.direction + v) * self.size, self.direction + v*2))
+            Bullets.append(Bullet(self.position + (self.direction + v) * self.size, self.direction + v*3))
         # print(Bullets)
         return Bullets
 

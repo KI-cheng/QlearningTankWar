@@ -11,20 +11,20 @@ import torch
 class Game:
     def __init__(self, window_size=800):
         """
-        window_size: 窗口尺寸
-        screen: 游戏屏幕
-        clock: 游戏时钟
-        FPS: 游戏帧率
-        player: 玩家坦克
-        enemy: 敌方坦克
-        bullets: 子弹列表
-        game_over: 游戏状态
+        game_over:游戏状态
+        bullets:储存多有的子弹列表
+        player:储存玩家对象
+        model:加载pth模型
+        WINDOW_SIZE:游戏画面尺寸
+        clock&fps:渲染每帧游戏画面
+        first_run_flag:游戏进入的初始UI设置界面
         """
         self.game_over = None
         self.bullets = None
         self.enemy = None
         self.player = None
-        self.model = None  # 添加模型属性
+        self.model = None
+        self.first_run_flag = True
         pygame.init()
         self.WINDOW_SIZE = window_size
         self.screen = pygame.display.set_mode((window_size, window_size))
@@ -113,10 +113,39 @@ class Game:
                         running = False
                     elif event.key == pygame.K_r and self.game_over:
                         self.reset_game()
-
-            self.update()  # 更新游戏objects的状态
-            self.draw()  # 渲染更新后的状态
+                    elif event.key == pygame.K_y:
+                        self.first_run_flag = False
+            if not self.first_run_flag:
+                self.update()  # 更新游戏objects的状态
+                self.draw()  # 渲染更新后的状态
+            else:
+                self.draw_init_ui()
             self.clock.tick(self.FPS)
 
         pygame.quit()
         sys.exit()
+
+    def draw_init_ui(self):
+        self.screen.fill((255, 255, 255))
+        font = pygame.font.Font(None, 74)
+        title = font.render('Tank War', True, (0, 0, 0))
+        title_rect = title.get_rect(center=(self.WINDOW_SIZE / 2, self.WINDOW_SIZE / 2 - 300))
+        self.screen.blit(title, title_rect)
+        font2 = pygame.font.Font(None, 35)
+        # 将文本分成多行
+        lines = [
+            "Welcome! In the game you are roleplay as a tank controller",
+            "You should to wipe out all the ai enemy to win the game.",
+            "Press Y to start game, press R to restart the,",
+            "press SPACE to shoot and press ESC to quit the game.",
+            "Enjoy it ! !"
+        ]
+
+        # 逐行渲染
+        line_height = font2.get_height()
+        for i, line in enumerate(lines):
+            text = font2.render(line, True, (0, 0, 0))
+            text_rect = text.get_rect(center=(self.WINDOW_SIZE / 2, self.WINDOW_SIZE / 2 + i * line_height))
+            self.screen.blit(text, text_rect)
+        pygame.display.flip()
+

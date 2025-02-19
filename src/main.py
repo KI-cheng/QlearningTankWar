@@ -8,7 +8,7 @@ if __name__ == "__main__":
         trainer = Trainer(window_size=800)
         trainer.train(episodes=300)
     elif flag == 'play':
-        model_path = "models/version2_300.pth"
+        model_path = "models/version2_100.pth"
 
         game = Game()
         game.load_ai_model(model_path)
