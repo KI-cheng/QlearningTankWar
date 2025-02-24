@@ -1,4 +1,5 @@
 # src/entities/enemy.py
+import pygame
 import torch
 import numpy as np
 from pygame.math import Vector2
@@ -6,7 +7,7 @@ from .tank import Tank
 
 
 class Enemy(Tank):
-    def __init__(self, x, y, size=20, speed=5):
+    def __init__(self, x, y, size=20, speed=6):
         super().__init__(x, y, size, speed)
         self.state_size = 42  # 状态空间维度
         self.action_size = 5  # 动作空间维度(上下左右停)
@@ -63,3 +64,10 @@ class Enemy(Tank):
 
         state = self.get_state(bullets)  # 获取所有的位置
         return self.act(state, model)  # 模型选择的动作
+
+    def draw(self, screen):
+        if self.alive:
+            color = {3: 0, 2: 96, 1: 192, 0: 255}
+            c = (color[self.life], color[self.life], color[self.life])
+            pygame.draw.rect(screen, c, self.rect)
+

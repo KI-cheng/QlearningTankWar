@@ -1,10 +1,9 @@
+
 import pygame
 import sys
-
 from src.entities.enemy import Enemy
 from src.entities.player import Player
-from src.entities.tank import Tank
-from src.trainer import DQN  # 导入DQN模型
+from src.trainer import DQN
 import torch
 
 
@@ -45,7 +44,7 @@ class Game:
             print(f"Error loading model: {e}")
             sys.exit(1)
 
-    def reset_game(self):
+    def reset_game(self,):
         """重置游戏状态"""
         self.player = Player(self.WINDOW_SIZE / 2, self.WINDOW_SIZE - 100)
         self.enemy = Enemy(self.WINDOW_SIZE / 2, 100)
@@ -129,23 +128,26 @@ class Game:
         self.screen.fill((255, 255, 255))
         font = pygame.font.Font(None, 74)
         title = font.render('Tank War', True, (0, 0, 0))
-        title_rect = title.get_rect(center=(self.WINDOW_SIZE / 2, self.WINDOW_SIZE / 2 - 300))
+        title_rect = title.get_rect(center=(self.WINDOW_SIZE / 2, self.WINDOW_SIZE / 2 -100))
         self.screen.blit(title, title_rect)
         font2 = pygame.font.Font(None, 35)
         # 将文本分成多行
         lines = [
-            "Welcome! In the game you are roleplay as a tank controller",
-            "You should to wipe out all the ai enemy to win the game.",
-            "Press Y to start game, press R to restart the,",
-            "press SPACE to shoot and press ESC to quit the game.",
-            "Enjoy it ! !"
+            "In the game you are role-playing as a tank controller.",
+            "You should to wipe out all the ai enemy to win!",
+            "Press Y to start game",
+            "press R to restart the game",
+            "press WSAD to move the tank",
+            "press SPACE to shoot",
+            "press ESC to quit the game",
         ]
 
         # 逐行渲染
         line_height = font2.get_height()
         for i, line in enumerate(lines):
-            text = font2.render(line, True, (0, 0, 0))
+            text = font2.render(line, True, (0, 50, 0))
             text_rect = text.get_rect(center=(self.WINDOW_SIZE / 2, self.WINDOW_SIZE / 2 + i * line_height))
             self.screen.blit(text, text_rect)
         pygame.display.flip()
+
 

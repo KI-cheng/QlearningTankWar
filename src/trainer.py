@@ -60,10 +60,10 @@ class Trainer:
             self.bullets.append(Bullet(pos, dir))
 
     def get_reward(self):
-        """计算奖励"""
-        reward = 1  # 存活奖励
+        """calculate reward"""
+        reward = 1  # surviving reward
 
-        # 距离中心的惩罚
+        # out of centre ----> penalty
         center = Vector2(self.window_size / 2, self.window_size / 2)
         dist_to_center = (self.enemy.position - center).length()
         if dist_to_center > self.window_size * 2 / 5:
@@ -75,7 +75,6 @@ class Trainer:
         x2,y2: 子弹当前位置---->bullet.position.x, bullet.position.y
         m,n: 子弹的方向向量---->bullet.direction.x,bullet.direction.y,
         distance: 判定为碰撞的距离阈值
-        
         直线方程？ax+by+c=0
         转化问题吧，已知一个点和一个向量，求直线方程，然后看ai的位置在不在方程上。
         如果在：巨额惩罚
@@ -83,12 +82,12 @@ class Trainer:
                 （是不是可以归一化一下，给予奖励，距离越远奖励越好。相乘）
         """
         for bullet in self.bullets:
-            # 获取子弹直线方程参数 (ax + by + c = 0)
+            # (ax + by + c = 0)
             a = bullet.direction.y
             b = -bullet.direction.x
             c = bullet.direction.x * bullet.position.y - bullet.direction.y * bullet.position.x
 
-            # 计算当前位置到子弹路径的距离
+            # calculate the distance between tank and bullet line
             x1, y1 = self.enemy.position.x, self.enemy.position.y
             distance = abs(a * x1 + b * y1 + c) / ((a * a + b * b) ** 0.5)
 
@@ -97,13 +96,13 @@ class Trainer:
             dy = y1 - bullet.position.y
             in_front = (dx * bullet.direction.x + dy * bullet.direction.y) >= 0
 
-            # 根据距离和方向计算奖励
-            if in_front:  # 只有在子弹前进方向上才考虑威胁
-                if distance < 20:  # 以坦克的size来看定义为危险，会被集中
+            # calculate the reward based on the distance and direction
+            if in_front:  # on the bullet direction
+                if distance < 20:  # size of tank
                     reward -= 2.0
                 else:
-                    # 距离越远，奖励越高（归一化到0-1之间）
-                    safe_distance = min(distance, 200) / 200  # 200是最大考虑距离
+                    # the longer distance is ,the higher reward will get
+                    safe_distance = min(distance, 200) / 200  # 200 is the max distance
                     reward += safe_distance * 0.1
 
         return reward
